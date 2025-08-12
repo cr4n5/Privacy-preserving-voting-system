@@ -1,46 +1,51 @@
-# 基于同态加密的隐私保护投票系统
+# Privacy-preserving voting system based on homomorphic encryption
 
-## 简介
+<p align="center">
+  <a href="./README.md"><img alt="README in English" src="https://img.shields.io/badge/English-d9d9d9"></a>
+  <a href="./README_CN.md"><img alt="简体中文版自述文件" src="https://img.shields.io/badge/简体中文-d9d9d9"></a>
+</p>
 
-本系统建立了一个基于Paillier同态加密技术的隐私保护投票平台，实现了对投票过程的隐私保护。系统分为数据需求方和三方计算两部分，数据需求方负责投票信息的设置、获取和投票结果的获取，三方计算负责接收加密投票信息并计算投票结果。系统使用Paillier同态加密技术对投票信息进行加密，保证了投票过程的隐私性，有效的防止了贿选和抵抗了强迫投票人的攻击。
+## Introduction
 
-## 框架图
+This system establishes a privacy-preserving voting platform based on Paillier homomorphic encryption technology, ensuring privacy during the voting process. The system is divided into two parts: the data demander and the third-party computation system. The data demander is responsible for setting and obtaining voting information and obtaining voting results, while the third-party computation system receives encrypted voting information and calculates the voting results. The system uses Paillier homomorphic encryption to encrypt voting information, ensuring privacy during the voting process and effectively preventing vote-buying and attacks by those who coerce voters.
 
-![框架图](img/基于同态加密的隐私保护投票系统/image.png)
+## Framework Diagram
 
-## 密码学安全逻辑
+![Framework Diagram](img/Privacy-preserving-voting-system-based-on-homomorphic-encryption/image.png)
 
-![密码学安全逻辑](img/基于同态加密的隐私保护投票系统/image1.png)
+## Cryptographic Security Logic
 
-## Paillier同态加密
+![Cryptographic Security Logic](img/Privacy-preserving-voting-system-based-on-homomorphic-encryption/image1.png)
 
-**生成密钥对**：
+## Paillier Homomorphic Encryption
 
-1. 选择两个大素数 p 和 q。
-2. 计算 n = p * q 和 λ = lcm(p-1, q-1)。
-3. 选择一个随机数 g，使得 g 的阶为 n。
-4. 计算 μ = (L(g^λ mod n^2))^(-1) mod n，其中 L(u) = (u-1)/n。
-5. 公钥为 (n, g)，私钥为 (λ, μ)。
+**Key Pair Generation**：   
 
-**加密**：
+1. Choose two large prime numbers p and q.
+2. Compute n = p * q and λ = lcm(p-1, q-1).
+3. Choose a random number g such that g has order n.
+4. Compute μ = (L(g^λ mod n^2))^(-1) mod n, where L(u) = (u-1)/n.
+5. The public key is (n, g) and the private key is (λ, μ).
 
-1. 选择一个随机数 r。
-2. 计算密文 c = g^m * r^n mod n^2，其中 m 是明文。
+**Encryption**：
 
-**解密**：
+1. Choose a random number r.
+2. Compute the ciphertext c = g^m * r^n mod n^2, where m is the plaintext.
 
-1. 计算 m = L(c^λ mod n^2) * μ mod n。
+**Decryption**：
 
-**同态性质**：`E(m1) * E(m2) = E(m1 + m2) mod n^2 加法同态性质`
+1. Compute m = L(c^λ mod n^2) * μ mod n.
 
-1. 给定两个密文 c1 和 c2，对应的明文为 m1 和 m2。
-2. 计算 c = c1 * c2 mod n^2，对应的明文为 m1 + m2。
+**Homomorphic Properties**：`E(m1) * E(m2) = E(m1 + m2) mod n^2 Additive Homomorphism`
 
-## 后端接口文档
+1. Given two ciphertexts c1 and c2, corresponding to plaintexts m1 and m2.
+2. Compute c = c1 * c2 mod n^2, corresponding to plaintext m1 + m2.
 
-### 数据需求方 `端口号：5000`
+## Backend interface documentation
 
-1. **获取公钥**：
+### Data demanders `PORT：5000`
+
+1. **Get the public key**：
 
 - URL: /get_pubkey
 - method: GET
@@ -57,7 +62,7 @@
 }
 ```
 
-2. **删除投票会话（删除密钥对,删除投票对象信息,删除投票结果）**：
+2. **Delete the voting session (delete key pair, delete voting object information, delete voting results)**:
 
 - URL: /restart
 - method: POST
@@ -87,7 +92,7 @@ Error:
 }
 ```
 
-3. **设置投票信息**：
+3. **Set voting information**：
 
 - URL: /set_vote_info
 - method: POST
@@ -109,7 +114,7 @@ Error:
 }
 ```
 
-4. **获取投票信息**：
+4. **Get voting information**：
 
 - URL: /get_vote_info
 - method: GET
@@ -141,14 +146,13 @@ Error:
 } 
 ```
 
-5. **获取投票结果**：
+5. **Get voting results**：
 
 - URL: /get_vote_result
 - method: GET
 - response:
 
-分数为总分
-正常包含投票结果
+The score is the total score. Normally includes voting results.
 
 ```json
 {
@@ -175,7 +179,7 @@ Error:
 }
 ```
 
-有投票会话未有人投票
+There is a voting session but no one voted
 
 ```json
 {
@@ -198,7 +202,7 @@ Error:
 }
 ```
 
-6. **接收加密投票**：`三方计算接口`
+6. **Receive encrypted votes**：`Third-party computing interface`
 
 - URL: /receive_vote
 - method: POST
@@ -225,9 +229,9 @@ Error:
 }
 ```
 
-### 三方计算 `端口号：5001`
+### Third-party computing interface `PORT：5001`
 
-1. **删除投票会话（删除加密投票信息）**：
+1. **Delete the voting session (delete encrypted voting information)**：
 
 - URL: /restart
 - method: POST
@@ -257,7 +261,7 @@ Error:
 }
 ```
 
-2. **提交加密投票**：
+2. **Submit encrypted votes**：
 
 - URL: /submit_vote
 - method: POST
